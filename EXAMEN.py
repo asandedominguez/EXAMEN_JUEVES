@@ -2276,22 +2276,22 @@ class trabajador(persoa):
         # Validar que los dígitos son correctos
         if not (nuss[:2].isdigit() and nuss[3:11].isdigit() and nuss[12:].isdigit()):
             raise NussError("Formato de NUSS incorrecto, error en los dígitos")
-        self.nuss = nuss
+        self.__nuss = nuss
 
     # Getter de NUSS
     def getNUSS(self):
-        return self.nuss
+        return self.__nuss
 
     # Representación como string
     def __str__(self):
-        return f"{self.nome} {self.dni} {self.idade} {self.nuss}"
+        return f"{self.getNome()} {self.getDni()} {self.getIdade()} {self.getNUSS()}"
 
 
 # === EJEMPLO DE USO ===
 if __name__ == "__main__":
     try:
         # DNI válido: 55438023G, edad int, NUSS válido: 12/12345678/90
-        t = trabajador(nome="Alan", dni="26623774D", idade=30, nuss="12/111111111/90")
+        t = trabajador(nome="Alan", dni="26623774D", idade=30, nuss="12/12335556/7890")
         print("Trabajador creado correctamente:")
         print(t)
 
