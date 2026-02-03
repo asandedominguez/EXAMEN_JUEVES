@@ -2256,23 +2256,56 @@ if __name__=='__main__':
         print("Fin del programa")
 
 #NUSS ERROR
-from Persoa2 import persoa
-from NussError import NussError
+# archivo: trabajador.py
+from Persoa2 import persoa   # Asegúrate de que Persoa2.py tenga la clase persoa
+from NussError import NussError  # Tu clase de error personalizada para NUSS
+from ErrorDNi import DniError    # Tu clase de error personalizada para DNI
+
 class trabajador(persoa):
-    def __init__(self,nome,dni,idade,nuss):
-        super().__init__(nome,dni,idade)
+    def __init__(self, nome, dni, idade, nuss):
+        super().__init__(nome, dni.upper(), idade)  # Forzar mayúscula en DNI
         self.setNUSS(nuss)
 
-    def setNUSS(self,nuss):
+    # Setter de NUSS
+    def setNUSS(self, nuss):
         if len(nuss) != 16:
-            raise NussError("La longitud de NUSS es inadecuada(16)")
-        elif nuss[:2]!="/" or nuss[-3]!="/":
-            raise NussError ("O formato é nn/nnnnnnnnn/nn. Error de formato")
-        elif not nuss[:2].isdigit() or not nuss[3:-3].isdigit() or not nuss[-2:].isdigit():
-            raise NussError("Formato de NUSS incorecto, error en los digitos")
-        self.nuss=nuss
+            raise NussError("La longitud de NUSS es inadecuada (16)")
+        # Validar barras en posiciones correctas
+        if nuss[2] != "/" or nuss[11] != "/":
+            raise NussError("Formato esperado: nn/nnnnnnnnn/nn")
+        # Validar que los dígitos son correctos
+        if not (nuss[:2].isdigit() and nuss[3:11].isdigit() and nuss[12:].isdigit()):
+            raise NussError("Formato de NUSS incorrecto, error en los dígitos")
+        self.nuss = nuss
+
+    # Getter de NUSS
     def getNUSS(self):
         return self.nuss
+
+    # Representación como string
+    def __str__(self):
+        return f"{self.nome} {self.dni} {self.idade} {self.nuss}"
+
+
+# === EJEMPLO DE USO ===
+if __name__ == "__main__":
+    try:
+        # DNI válido: 55438023G, edad int, NUSS válido: 12/12345678/90
+        t = trabajador(nome="Alan", dni="26623774D", idade=30, nuss="12/111111111/90")
+        print("Trabajador creado correctamente:")
+        print(t)
+
+    except ValueError as ve:
+        print("Error de valor:", ve)
+    except TypeError as te:
+        print("Error de tipo:", te)
+    except NussError as ne:
+        print("Error de NUSS:", ne)
+    except DniError as de:
+        print("Error de DNI:", de)
+    finally:
+        print("Fin del programa")
+
 
 PERSONA2
 from ErrorDNi import DniError
