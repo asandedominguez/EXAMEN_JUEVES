@@ -2838,5 +2838,151 @@ class CocheAutonomo(Terrestre):
 
 coche = CocheAutonomo(1231,234,123,4,5)
 
-print(coche.mostrardatos())
-MIKM
+XOGADOR
+class Xogador:
+    def __init__(self,nome):
+        self.set_nome(nome)
+        self.__puntuacion = 0
+
+    def get_nome(self):
+        return self.__nome
+    def get_puntuacion(self):
+        return self.__puntuacion
+
+    def set_puntos(self, p:int):
+        if not isinstance(p, int) or p <= 0:
+            raise ValueError("Os puntos deben ser enteiros positivos")
+        self.__puntuacion += p
+
+    def set_nome(self, nome:str):
+        if not isinstance(nome,str):
+            raise TypeError("El nombre debe ser de tipo string")
+        else:
+            self.__nome = nome
+
+    def __str__(self):
+        return (f"{self.get_nome()} - puntos: {self.get_puntuacion()}")
+
+
+    PARTIDA
+from xogador import Xogador
+from XogadorNonExisteError import XogadorNonExisteError
+class Partida:
+    def __init__(self, num_xogadores):
+        self.__num_max_xogadores = num_xogadores
+        self.__xogadores = [None] * num_xogadores
+        self.__num_xogadores = 0
+        self.__num_xogadores = len(self.__xogadores)
+
+    def get_xogador(self,nome):
+        for xogador in self.__xogadores:
+            if xogador is not None and xogador.get_nome() == nome:
+                return xogador
+        return None
+
+    def add_xogador(self,xogador):
+        if not isinstance(xogador, Xogador):
+            return -1
+        if self.get_xogador(xogador.get_nome()) is not None:
+            return -1
+        for i in range(len(self.__xogadores)):
+            if self.__xogadores[i] is None:
+                self.__xogadores[i] = xogador
+                self.__num_xogadores += 1
+                return i
+        return -1
+
+    def get_xogadores(self):
+        return self.__xogadores
+
+    def add_puntos_a_xogador(self,nome_e_puntos:str):
+        if "-" in nome_e_puntos:
+            parte = nome_e_puntos.split("-")
+        else:
+            parte = nome_e_puntos.split(" ")
+        if len(parte) != 2:
+            raise ValueError("Formato incorrecto")
+        nome = parte[0]
+        puntos = int(parte[1])
+        xogador = self.get_xogador(nome)
+        if xogador is None:
+            raise XogadorNonExisteError("O xogador non existe")
+        xogador.set_puntos(puntos)
+        return xogador.get_puntuacion()
+
+    def get_xogador_con_min_puntos(self,numero:int):
+        for xogador in self.__xogadores:
+            if xogador is not None and xogador.get_puntuacion() >= numero:
+                return xogador
+        return None
+
+GAME_GUESS
+from xogador import Xogador
+from partida import Partida
+from XogadorNonExisteError import XogadorNonExisteError
+def pedir_entero_positivo(mensaje):
+    while True:
+        try:
+            n = int(input(mensaje))
+            if n > 0:
+                return n
+            print("Debe ser un número positivo.")
+        except ValueError:
+            print("Entrada non válida.")
+
+
+class XogoImpostor:
+
+    def __init__(self):
+        self.partida = None
+        self.ganador = None
+
+    def iniciar_partida(self):
+
+        num_xogadores = pedir_entero_positivo("Introduce o número de xogadores: ")
+
+        self.partida = Partida(num_xogadores)
+
+        for i in range(num_xogadores):
+            while True:
+                nome = input(f"Nome do xogador {i+1}: ")
+
+                if nome == "":
+                    print("Nome inválido.")
+                    continue
+
+                xogador = Xogador(nome)
+
+                if self.partida.add_xogador(xogador) != -1:
+                    break
+                print("Xa existe un xogador con ese nome.")
+
+        while self.ganador is None:
+            nome = input("Nome do xogador que anota puntos: ")
+            xogador = self.partida.get_xogador(nome)
+            if xogador is None:
+                print("O xogador non existe.")
+                continue
+            puntos = pedir_entero_positivo("Puntos conseguidos: ")
+            try:
+                total = self.partida.add_puntos_a_xogador(f"{nome} {puntos}")
+                print(f"Puntuación de {nome}: {total}")
+                if total >= 50:
+                    self.ganador = xogador
+            except XogadorNonExisteError as error:
+                print(error)
+        print("\n--- FIN DO XOGO ---")
+        print("Puntuación final:")
+        for xog in self.partida.get_xogadores():
+            if xog is not None:
+                print(xog)
+        print(f"\n🏆 Gañador do xogo: {self.ganador.get_nome()}")
+
+if __name__ == "__main__":
+    xogo = XogoImpostor()
+    xogo.iniciar_partida()
+
+XOGADOR ERROR
+class XogadorNonExisteError(Exception):
+    def __init__(self, mensaxe="O xogador non existe"):
+        super().__init__(mensaxe)
