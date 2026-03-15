@@ -3211,3 +3211,417 @@ class XogoImpostor:
 if __name__ == "__main__":
     xogo = XogoImpostor()
     xogo.iniciar_partida()
+
+#Crear un programa xestor de notas persoais, que permita ao usuario gardar e consultar notas.
+#O usuario pode engadir unha nova nota (texto libre).
+
+#As notas gárdanse nun ficheiro de texto (notas.txt), unha por liña.
+
+#O programa pode listar todas as notas gardadas.
+
+#O usuario pode buscar notas que conteñan unha palabra clave.
+
+INTERFAZ
+from xestor import Xestor
+class Interfaz(Xestor):
+    def __init__(self):
+        self.xestor = Xestor( 'Notas.txt')
+    def menuPrincipal(self):
+
+        while True:
+            print("Programa de exstion de almacen")
+            print("______________________________")
+            print("1.Lista Notas")
+            print("2.Engadir Nota")
+            print("3.Buscar por palabra clave")
+            print("4.Salir")
+            option = input("Elixa unha opcion: ")
+            match option:
+                case '1':
+                    self.xestor.mostrarNotas()
+                case '2':
+                    self.xestor.añadirNota()
+                case '3':
+                    Palabra = input("Escribe la palabra clave: ")
+                    self.xestor.buscarNotas(Palabra)
+                case '4':
+                    self.xestor.guardarNotas('Notas.txt')
+                    break
+if __name__=="__main__":
+
+    x = Interfaz()
+    x.menuPrincipal()
+
+XESTOR
+class Xestor:
+    def __init__(self,rutafichero):
+        self.listaNotas = []
+        self.cargarNotas(rutafichero)
+
+    def añadirNota(self):
+        Nota = input("Añade una nota:")
+        self.listaNotas.append(Nota)
+        print("Nota añadida corectamente")
+
+    def mostrarNotas(self):
+        for notas in self.listaNotas:
+            print(notas)
+
+    def buscarNotas(self, palabra_clave):
+        # Creamos unha lista para gardar as notas que coincidan
+        notas_encontradas = []
+        # Percorremos cada nota na lista
+        for nota in self.listaNotas:
+            # Se a palabra clave está dentro da nota (sen diferenciar maiúsculas/minúsculas)
+            if palabra_clave.lower() in nota.lower():
+                # Engadimos a nota á lista de resultados
+                notas_encontradas.append(nota)
+
+        # Comprobamos se atopamos algunha nota
+        if notas_encontradas:
+            print(f"Notas que conteñen '{palabra_clave}':")
+            for nota in notas_encontradas:
+                print(nota)
+        else:
+            print(f"Non se atoparon notas que conteñan '{palabra_clave}'.")
+
+    def cargarNotas(self, fichero):
+        # Abrimos el archivo en modo lectura ('r')
+        # 'with' asegura que se cierre automáticamente al terminar
+        with open(fichero, 'r') as fich:
+            # Recorremos el archivo línea por línea
+            try:
+                for linea in fich:
+                # 'strip()' elimina saltos de línea y espacios al inicio/final
+                # 'append()' añade la línea limpia a la lista de notas
+                    self.listaNotas.append(linea.strip())
+            except FileNotFoundError:
+                print(f"No se encontró el archivo '{fichero}'. Se empezará con una lista vacía.")
+    def guardarNotas(self, fichero):
+        # Abrimos el archivo en modo escritura ('w')
+        # Esto sobrescribe el archivo si ya existía
+        with open(fichero, 'w') as fich:
+             # Recorremos cada nota en la lista de notas
+            for nota in self.listaNotas:
+                # Escribimos la nota en el archivo
+                # Añadimos '\n' para que cada nota esté en una línea separada
+                fich.write(nota + '\n')
+            # Mensaje de confirmación
+            print("Notas guardadas correctamente")
+
+    CREAR NOTAS.TXT
+
+#Ler un ficheiro de texto e contar cantas veces aparece cada palabra.
+#Solicita ao usuario o nome dun ficheiro .txt.
+
+#Mostra a frecuencia de cada palabra (ignorando maiúsculas/minúsculas e signos de puntuación).
+
+#Gárdase un resumo nun novo ficheiro resumo_palabras.txt.
+CUANDO TRABAJEMOS CON CADENAS DE TEXTO (STRINGS) UTILIZAR ESTO
+import string
+
+# Solicitar nome do ficheiro
+nome_ficheiro = input("Introduce o nome do ficheiro .txt: ")
+
+frecuencias = {}
+
+try:
+    with open(nome_ficheiro, "r", encoding="utf-8") as f:
+        texto = f.read().lower()
+        # Eliminar signos de puntuación
+        for p in string.punctuation:
+            texto = texto.replace(p, "")
+
+        palabras = texto.split()
+
+        # Contar palabras
+        for palabra in palabras:
+            if palabra in frecuencias:
+                frecuencias[palabra] += 1
+            else:
+                frecuencias[palabra] = 1
+
+    # Mostrar resultados
+    print("\nFrecuencia de palabras:")
+    for palabra, conta in frecuencias.items():
+        print(palabra, ":", conta)
+
+    # Gardar resumo nun ficheiro
+    with open("resumo_palabras.txt", "w", encoding="utf-8") as resumo:
+        for palabra, conta in frecuencias.items():
+            resumo.write(f"{palabra}: {conta}\n")
+
+    print("\nResumo gardado en 'resumo_palabras.txt'.")
+
+except FileNotFoundError:
+    print("O ficheiro non existe.")
+
+#Crear unha aplicación para anotar tarefas para facer. A tarefa terá unha data, hora, duración, Nome da tarefa, descrición,  estado (feita, non feita). Para iso crear unha clase Tarefa que manexe os datos relacionados coa tarefa.  O usuario poderá facer as seguintes operacións:
+#Agregar unha nova tarefa.
+#Borrar unha tarefa.
+#Modificar unha tarefa.
+#Listar o listado de tarefas.
+#As tarefas se gardarán nun ficheiro binario chamado tarefas.dat.
+ficheros binarios
+import pickle
+from datetime import date
+
+FICHEIRO = "tarefas.dat"
+
+class Tarefa:
+    def __init__(self, nome, descricion, data=None, hora="", duracion="", estado="non feita"):
+        self.nome = nome
+        self.descricion = descricion
+        self.data = data if data else date.today()
+        self.hora = hora
+        self.duracion = duracion
+        self.estado = estado
+
+    def __str__(self):
+        return f"{self.nome} | {self.descricion} | {self.data} | {self.hora} | {self.duracion} | {self.estado}"
+
+
+def cargar_tarefas():
+    try:
+        with open(FICHEIRO, "rb") as f:
+            return pickle.load(f)
+    except:
+        return []
+
+
+def gardar_tarefas(tarefas):
+    with open(FICHEIRO, "wb") as f:
+        pickle.dump(tarefas, f)
+
+
+def agregar_tarefa():
+    nome = input("Nome da tarefa: ")
+    descricion = input("Descrición: ")
+    hora = input("Hora: ")
+    duracion = input("Duración: ")
+
+    tarefa = Tarefa(nome, descricion, hora=hora, duracion=duracion)
+
+    tarefas = cargar_tarefas()
+    tarefas.append(tarefa)
+    gardar_tarefas(tarefas)
+
+    print("Tarefa agregada.")
+
+
+def listar_tarefas():
+    tarefas = cargar_tarefas()
+    for i, t in enumerate(tarefas):
+        print(i, "-", t)
+
+
+def borrar_tarefa():
+    tarefas = cargar_tarefas()
+    listar_tarefas()
+    i = int(input("Número da tarefa a borrar: "))
+    tarefas.pop(i)
+    gardar_tarefas(tarefas)
+    print("Tarefa borrada.")
+
+
+def modificar_tarefa():
+    tarefas = cargar_tarefas()
+    listar_tarefas()
+
+    i = int(input("Número da tarefa a modificar: "))
+    t = tarefas[i]
+
+    t.nome = input(f"Novo nome ({t.nome}): ") or t.nome
+    t.descricion = input(f"Nova descrición ({t.descricion}): ") or t.descricion
+    t.estado = input(f"Estado ({t.estado}): ") or t.estado
+
+    gardar_tarefas(tarefas)
+    print("Tarefa modificada.")
+
+
+def menu():
+    while True:
+        print("\n1. Agregar tarefa")
+        print("2. Borrar tarefa")
+        print("3. Modificar tarefa")
+        print("4. Listar tarefas")
+        print("5. Saír")
+
+        op = input("Opción: ")
+
+        if op == "1":
+            agregar_tarefa()
+        elif op == "2":
+            borrar_tarefa()
+        elif op == "3":
+            modificar_tarefa()
+        elif op == "4":
+            listar_tarefas()
+        elif op == "5":
+            break
+
+
+menu()
+
+#Crea a aplicación que permita gardar e recuperar os datos dos clientes dunha empresa. Para o cal, defina a clase Cliente, que teña os atributos:
+#id, identificador de cliente
+#nome
+#teléfono
+#	Os obxectos Cliente se recollerán nunha lista.
+#	A aplicación terá un menú que posibilitará as seguintes opcións:
+#Engadir novo cliente
+#Modificar datos
+#Dar de baixa clientes.
+#Listar os clientes.
+#	A información se gardará nun ficheiro binario, que cargará en memoria o iniciar o programa e se gardará en disco, actualizado o rematar.
+import pickle
+import os
+
+FICHEIRO = "clientes.dat"
+
+class Cliente:
+    def __init__(self, id, nome, telefono):
+        self.id = id
+        self.nome = nome
+        self.telefono = telefono
+
+    def __str__(self):
+        return f"ID: {self.id} | Nome: {self.nome} | Teléfono: {self.telefono}"
+
+
+# Cargar clientes do ficheiro
+def cargar_clientes():
+    if os.path.exists(FICHEIRO):
+        with open(FICHEIRO, "rb") as f:
+            return pickle.load(f)
+    return []
+
+
+# Gardar clientes no ficheiro
+def gardar_clientes(lista):
+    with open(FICHEIRO, "wb") as f:
+        pickle.dump(lista, f)
+
+
+# Engadir cliente
+def engadir_cliente(lista):
+    id = input("ID do cliente: ")
+    nome = input("Nome: ")
+    telefono = input("Teléfono: ")
+
+    cliente = Cliente(id, nome, telefono)
+    lista.append(cliente)
+    print("Cliente engadido correctamente.\n")
+
+
+# Modificar cliente
+def modificar_cliente(lista):
+    id = input("Introduce o ID do cliente a modificar: ")
+
+    for cliente in lista:
+        if cliente.id == id:
+            cliente.nome = input("Novo nome: ")
+            cliente.telefono = input("Novo teléfono: ")
+            print("Cliente modificado.\n")
+            return
+
+    print("Cliente non atopado.\n")
+
+
+# Dar de baixa cliente
+def eliminar_cliente(lista):
+    id = input("ID do cliente a eliminar: ")
+
+    for cliente in lista:
+        if cliente.id == id:
+            lista.remove(cliente)
+            print("Cliente eliminado.\n")
+            return
+
+    print("Cliente non atopado.\n")
+
+
+# Listar clientes
+def listar_clientes(lista):
+    if not lista:
+        print("Non hai clientes rexistrados.\n")
+    else:
+        for cliente in lista:
+            print(cliente)
+        print()
+
+
+# Programa principal
+def main():
+    clientes = cargar_clientes()
+
+    while True:
+        print("---- MENÚ ----")
+        print("1. Engadir novo cliente")
+        print("2. Modificar datos")
+        print("3. Dar de baixa cliente")
+        print("4. Listar clientes")
+        print("5. Saír")
+
+        opcion = input("Escolle unha opción: ")
+
+        if opcion == "1":
+            engadir_cliente(clientes)
+        elif opcion == "2":
+            modificar_cliente(clientes)
+        elif opcion == "3":
+            eliminar_cliente(clientes)
+        elif opcion == "4":
+            listar_clientes(clientes)
+        elif opcion == "5":
+            gardar_clientes(clientes)
+            print("Datos gardados. Saíndo do programa.")
+            break
+        else:
+            print("Opción non válida.\n")
+
+
+if __name__ == "__main__":
+    main()
+
+#Realizar un programa para a xestión de Inventario. O programa ten que facer as seguintes operacións sobre un ficheiro CSV:
+#Calculo do valor total do inventario: Dado un ficheiro produtos.csv (con columnas: id, nome, prezo, stock), o programa ten realizar o cálculo (prezo × stock).
+#Existencias baixas: Crea un novo ficheiro baixo_stock.csv que conteña só os produtos cun número de existencias inferior a 5 unidades. Gardar no ficheiro id, nome e stock.
+import csv
+
+ficheiro = "produtos.csv"
+
+valor_total = 0
+baixo_stock = []
+
+with open(ficheiro, newline='', encoding='utf-8') as f:
+    lector = csv.DictReader(f)
+
+    for fila in lector:
+        id = fila["id"]
+        nome = fila["nome"]
+        prezo = float(fila["prezo"])
+        stock = int(fila["stock"])
+
+        # calcular valor do produto
+        valor_total += prezo * stock
+
+        # comprobar stock baixo
+        if stock < 5:
+            baixo_stock.append({
+                "id": id,
+                "nome": nome,
+                "stock": stock
+            })
+
+print("Valor total do inventario:", valor_total)
+
+# gardar ficheiro baixo_stock.csv
+with open("baixo_stock.csv", "w", newline='', encoding='utf-8') as f:
+    campos = ["id", "nome", "stock"]
+    escritor = csv.DictWriter(f, fieldnames=campos)
+
+    escritor.writeheader()
+    escritor.writerows(baixo_stock)
+
+print("Ficheiro baixo_stock.csv creado correctamente.")
